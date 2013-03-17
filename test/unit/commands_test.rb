@@ -2,18 +2,25 @@ require "helper"
 require "spring/commands"
 
 class CommandsTest < ActiveSupport::TestCase
-  test "test command needs a test name" do
+  def run_spring_test(args)
     begin
+      real_stdout = $stdout
       real_stderr = $stderr
+      $stdout = StringIO.new('')
       $stderr = StringIO.new('')
 
       command = Spring::Commands::Test.new
-      command.call([])
-
-      assert_equal "you need to specify what test to run: spring test TEST_NAME\n", $stderr.string
+      command.call(args)
+      return $stdout.string, $stderr.string
     ensure
+      $stdout = real_stdout
       $stderr = real_stderr
     end
+  end
+
+  test "test command needs a test name" do
+    stdout, stderr = run_spring_test []
+    assert_equal "you need to specify what test to run: spring test TEST_NAME\n", stderr
   end
 
   test 'children of Command have inheritable accessor named "preload"' do
