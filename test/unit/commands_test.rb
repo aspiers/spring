@@ -18,11 +18,6 @@ class CommandsTest < ActiveSupport::TestCase
     end
   end
 
-  test "test command needs a test name" do
-    stdout, stderr = run_spring_test []
-    assert_equal "you need to specify what test to run: spring test TEST_NAME\n", stderr
-  end
-
   test "test command ignores spec directory" do
     stdout, stderr = run_spring_test ['test/unit', 'spec']
     expected_output = <<-EOF

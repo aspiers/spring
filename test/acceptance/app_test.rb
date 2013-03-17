@@ -142,7 +142,7 @@ class AppTest < ActiveSupport::TestCase
 
   teardown do
     app_run "#{spring} stop"
-    File.write(@test,       @test_contents)
+    File.write(@test,       @test_contents) unless @test.empty?
     File.write(@controller, @controller_contents)
   end
 

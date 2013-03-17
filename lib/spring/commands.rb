@@ -76,8 +76,7 @@ MESSAGE
 
       def call(args)
         if args.empty?
-          $stderr.puts "you need to specify what test to run: spring test TEST_NAME"
-          return
+          args = ['test']
         end
 
         # If a spec gets required here, it will stop all the test-unit
