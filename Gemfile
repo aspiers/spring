@@ -6,3 +6,7 @@ gemspec
 gem 'listen', :require => false
 gem 'rb-inotify', :require => false
 gem 'rb-fsevent', :require => false
+
+group :test do
+  gem 'rspec', :require => false
+end

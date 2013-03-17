@@ -35,7 +35,11 @@ class AppTest < ActiveSupport::TestCase
 
     Bundler.with_clean_env do
       Process.spawn(
-        { "GEM_HOME" => gem_home.to_s, "GEM_PATH" => "" },
+        {
+          "GEM_HOME" => gem_home.to_s,
+          "GEM_PATH" => "",
+          "SPRING_TEST_WITH_RSPEC" => opts.fetch(:rspec, false) ? 'true': '',
+        },
         command.to_s,
         out:   stdout.last,
         err:   stderr.last,
@@ -253,6 +257,15 @@ class AppTest < ActiveSupport::TestCase
     ensure
       File.write(application, application_contents)
     end
+  end
+
+  test "test-unit doesn't pollute rspec results" do
+    assert_success spring_test_command, stdout: "0 failures"
+    artifacts = app_run("#{spring} rspec", rspec: true)
+    assert artifacts[:status].success?, "expected successful exit status"
+    assert_match    /^Finished in /m,           artifacts[:stdout]
+    assert_match    /^1 example, 0 failures$/m, artifacts[:stdout]
+    assert_no_match /^Finished tests in/m,      artifacts[:stdout]
   end
 
   test "stop command kills server" do

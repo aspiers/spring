@@ -3,14 +3,21 @@ require "spring/commands"
 
 class CommandsTest < ActiveSupport::TestCase
   def run_spring_test(args)
+    run_spring_command('Test') do |command|
+      command.call(args)
+    end
+  end
+
+  def run_spring_command(subclass)
     begin
       real_stdout = $stdout
       real_stderr = $stderr
       $stdout = StringIO.new('')
       $stderr = StringIO.new('')
 
-      command = Spring::Commands::Test.new
-      command.call(args)
+      klass = Spring::Commands.const_get(subclass)
+      command = klass.new
+      yield command
       return $stdout.string, $stderr.string
     ensure
       $stdout = real_stdout
@@ -99,5 +106,14 @@ WARNING: spring test does not work on specs; skipping:
   test 'Runner#env ignores insignificant arguments' do
     command = Spring::Commands::Runner.new
     assert_nil command.env(['puts 1+1'])
+  end
+
+  test 'rspec command disables test-unit autorun' do
+    require 'test/unit'
+    run_spring_command('RSpec') do |command|
+      command.setup
+      command.call([])
+    end
+    assert_equal true, ::Test::Unit::Runner.class_variable_get("@@stop_auto_run")
   end
 end

@@ -7,3 +7,10 @@ gem 'sqlite3'
 gem 'rb-inotify', :require => false  # linux
 gem 'rb-fsevent', :require => false  # mac os x
 gem 'rb-kqueue',  :require => false  # bsd
+
+group :test do
+  if ENV['SPRING_TEST_WITH_RSPEC']
+    gem 'rspec'
+    gem 'rspec-rails'
+  end
+end

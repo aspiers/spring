@@ -120,6 +120,10 @@ MESSAGE
       end
 
       def call(args)
+        test_unit_loaded = ::Test::Unit::Runner.is_a? Class rescue false
+        if test_unit_loaded
+          ::Test::Unit::Runner.class_variable_set("@@stop_auto_run", true)
+        end
         $0 = "rspec"
         ::RSpec::Core::Runner.run(args)
       end
