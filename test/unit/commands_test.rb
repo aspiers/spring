@@ -23,6 +23,29 @@ class CommandsTest < ActiveSupport::TestCase
     assert_equal "you need to specify what test to run: spring test TEST_NAME\n", stderr
   end
 
+  test "test command ignores spec directory" do
+    stdout, stderr = run_spring_test ['test/unit', 'spec']
+    expected_output = <<-EOF
+WARNING: spring test does not work on specs; skipping:
+  spec
+    EOF
+    assert_equal expected_output, stderr
+  end
+
+  test "test command ignores spec file" do
+    stdout, stderr = run_spring_test [
+      'test/unit',
+      'spec/models/foo_spec.rb',
+      './spec/models/bar_spec.rb',
+    ]
+    expected_output = <<-EOF
+WARNING: spring test does not work on specs; skipping:
+  spec/models/foo_spec.rb
+  ./spec/models/bar_spec.rb
+    EOF
+    assert_equal expected_output, stderr
+  end
+
   test 'children of Command have inheritable accessor named "preload"' do
     command1, command2 = 2.times.map { Class.new(Spring::Commands::Command) }
 

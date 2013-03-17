@@ -75,17 +75,28 @@ MESSAGE
       end
 
       def call(args)
-        if args.size > 0
-          ARGV.replace args
-          path = File.expand_path(args.first)
+        if args.empty?
+          $stderr.puts "you need to specify what test to run: spring test TEST_NAME"
+          return
+        end
 
+        # If a spec gets required here, it will stop all the test-unit
+        # tests running for some strange reason, so we need to watch
+        # out for that.
+        specs, ok_paths = *args.partition { |path| path =~ %r{(^|/)spec(/|$)} }
+        if ! specs.empty?
+          $stderr.puts "WARNING: spring test does not work on specs; skipping:"
+          specs.each { |path| $stderr.puts "  #{path}" }
+        end
+
+        ARGV.replace ok_paths
+        ok_paths.each do |arg|
+          path = File.expand_path(arg)
           if File.directory?(path)
             Dir[File.join path, "**", "*_test.rb"].each { |f| require f }
           else
             require path
           end
-        else
-          $stderr.puts "you need to specify what test to run: spring test TEST_NAME"
         end
       end
 
